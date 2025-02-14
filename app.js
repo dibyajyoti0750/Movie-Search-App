@@ -1,6 +1,7 @@
 const btn = document.querySelector("#button-addon2");
 let inp = document.querySelector(".form-control");
 let errorMsg = document.querySelector(".error-msg ");
+let moviePoster = document.querySelector("#movie-poster");
 
 btn.addEventListener("click", setContent);
 
@@ -11,9 +12,7 @@ async function getRes(title) {
     if (res.data.Response === "False") throw new Error(res.data.Error);
     return res.data;
   } catch (error) {
-    errorMsg.textContent = error.message;
-    errorMsg.style.color = "red";
-    inp.focus();
+    console.log(error.message);
     return null;
   }
 }
@@ -27,7 +26,11 @@ async function setContent() {
 
   const movieData = await getRes(inp.value.trim());
   inp.value = "";
-  showMovieDetails(movieData);
+  if (!movieData) {
+    showErrors();
+  } else {
+    showMovieDetails(movieData);
+  }
 }
 
 function updateElements(selector, content) {
@@ -35,14 +38,12 @@ function updateElements(selector, content) {
 }
 
 function showMovieDetails(movieData) {
-  document
-    .querySelector("#movie-poster")
-    .setAttribute(
-      "src",
-      movieData.Poster !== "N/A"
-        ? movieData.Poster
-        : "https://placehold.co/400x600"
-    );
+  moviePoster.setAttribute(
+    "src",
+    movieData.Poster !== "N/A"
+      ? movieData.Poster
+      : "https://placehold.jp/30/cccccc/666666/400x600.png?text=NO+IMAGE+AVAILABLE"
+  );
   updateElements("#movie-title", movieData.Title);
   updateElements("#movie-year", movieData.Year);
   updateElements("#movie-genre", movieData.Genre);
@@ -57,4 +58,29 @@ function showMovieDetails(movieData) {
   updateElements("#movie-country", movieData.Country);
   errorMsg.textContent = "";
   errorMsg.style.display = "none";
+}
+
+function showErrors() {
+  inp.focus();
+  errorMsg.textContent = "Movie not found!";
+  errorMsg.style.display = "block";
+  errorMsg.style.color = "red";
+  moviePoster.setAttribute(
+    "src",
+    "https://placehold.jp/30/cccccc/666666/400x600.png?text=NO+IMAGE+AVAILABLE"
+  );
+  [
+    "#movie-title",
+    "#movie-year",
+    "#movie-genre",
+    "#movie-director",
+    "#movie-actors",
+    "#movie-language",
+    "#movie-runtime",
+    "#movie-awards",
+    "#movie-plot",
+    "#movie-rating",
+    "#movie-box-office",
+    "#movie-country",
+  ].forEach((selector) => updateElements(selector, "N/A"));
 }
