@@ -1,83 +1,60 @@
-const btn = document.querySelector(".btn-primary");
-const inp = document.querySelector(".form-control");
-let errorMsg = document.querySelector(".error-msg");
+const btn = document.querySelector("#button-addon2");
+let inp = document.querySelector(".form-control");
+let errorMsg = document.querySelector(".error-msg ");
 
-btn.addEventListener("click", () => {
-  setValues();
-});
+btn.addEventListener("click", setContent);
 
 async function getRes(title) {
-  let url = `http://www.omdbapi.com/?apikey=a00e3963&t=${title}`;
+  const url = `http://www.omdbapi.com/?t=${title}&apikey=a00e3963`;
   try {
-    let res = await axios.get(url);
-    if (res.data.Response === "False") {
-      throw new Error(res.data.Error);
-    }
+    const res = await axios.get(url);
+    if (res.data.Response === "False") throw new Error(res.data.Error);
     return res.data;
   } catch (error) {
-    errorMsg.textContent = error;
+    errorMsg.textContent = error.message;
     errorMsg.style.color = "red";
     inp.focus();
     return null;
   }
 }
 
-async function setValues() {
-  if (inp.value.trim() === "") {
+async function setContent() {
+  if (!inp.value.trim()) {
     alert("Please enter a movie name!");
     inp.focus();
     return;
   }
 
-  let data = await getRes(inp.value.trim());
+  const movieData = await getRes(inp.value.trim());
   inp.value = "";
+  showMovieDetails(movieData);
+}
 
-  let moviePoster = document.querySelector("#movie-poster");
-  let movieTitle = document.querySelector("#movie-title");
-  let movieYear = document.querySelector("#movie-year");
-  let movieGenre = document.querySelector("#movie-genre");
-  let movieDirector = document.querySelector("#movie-director");
-  let movieActors = document.querySelector("#movie-actors");
-  let movieLanguage = document.querySelector("#movie-language");
-  let movieRuntime = document.querySelector("#movie-runtime");
-  let movieAwards = document.querySelector("#movie-awards");
+function updateElements(selector, content) {
+  document.querySelector(selector).textContent = content ?? "N/A";
+}
 
-  let moviePlot = document.querySelector("#movie-plot");
-  let movieRating = document.querySelector("#movie-rating");
-  let movieBoxOffice = document.querySelector("#movie-box-office");
-  let movieCountry = document.querySelector("#movie-country");
-
-  if (!data) {
-    moviePoster.setAttribute("src", "https://placehold.co/400x600");
-    movieTitle.textContent = "Movie not found!";
-    movieYear.textContent = "N/A";
-    movieGenre.textContent = "N/A";
-    movieDirector.textContent = "N/A";
-    movieActors.textContent = "N/A";
-    movieLanguage.textContent = "N/A";
-    movieRuntime.textContent = "N/A";
-    movieAwards.textContent = "N/A";
-
-    moviePlot.textContent = "N/A";
-    movieRating.textContent = "N/A";
-    movieBoxOffice.textContent = "N/A";
-    movieCountry.textContent = "N/A";
-  } else {
-    errorMsg.textContent = "";
-    errorMsg.style.display = "none";
-    moviePoster.setAttribute("src", data.Poster);
-    movieTitle.textContent = data.Title;
-    movieYear.textContent = data.Year;
-    movieGenre.textContent = data.Genre;
-    movieDirector.textContent = data.Director;
-    movieActors.textContent = data.Actors;
-    movieLanguage.textContent = data.Language;
-    movieRuntime.textContent = data.Runtime;
-    movieAwards.textContent = data.Awards;
-
-    moviePlot.textContent = data.Plot;
-    movieRating.textContent = data.imdbRating;
-    movieBoxOffice.textContent = data.BoxOffice;
-    movieCountry.textContent = data.Country;
-  }
+function showMovieDetails(movieData) {
+  document
+    .querySelector("#movie-poster")
+    .setAttribute(
+      "src",
+      movieData.Poster !== "N/A"
+        ? movieData.Poster
+        : "https://placehold.co/400x600"
+    );
+  updateElements("#movie-title", movieData.Title);
+  updateElements("#movie-year", movieData.Year);
+  updateElements("#movie-genre", movieData.Genre);
+  updateElements("#movie-director", movieData.Director);
+  updateElements("#movie-actors", movieData.Actors);
+  updateElements("#movie-language", movieData.Language);
+  updateElements("#movie-runtime", movieData.Runtime);
+  updateElements("#movie-awards", movieData.Awards);
+  updateElements("#movie-plot", movieData.Plot);
+  updateElements("#movie-rating", movieData.imdbRating);
+  updateElements("#movie-box-office", movieData.BoxOffice);
+  updateElements("#movie-country", movieData.Country);
+  errorMsg.textContent = "";
+  errorMsg.style.display = "none";
 }
