@@ -24,11 +24,14 @@ async function setContent() {
     return;
   }
 
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
   const movieData = await getRes(inp.value.trim());
   inp.value = "";
   if (!movieData) {
+    btn.innerHTML = "Search Movie";
     showErrors();
   } else {
+    btn.innerHTML = "Search Movie";
     showMovieDetails(movieData);
   }
 }
