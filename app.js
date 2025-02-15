@@ -6,7 +6,7 @@ let moviePoster = document.querySelector("#movie-poster");
 btn.addEventListener("click", setContent);
 
 async function getRes(title) {
-  const url = `http://www.omdbapi.com/?t=${title}&apikey=a00e3963`;
+  const url = `https://www.omdbapi.com/?t=${title}&apikey=a00e3963`;
   try {
     const res = await axios.get(url);
     if (res.data.Response === "False") throw new Error(res.data.Error);
